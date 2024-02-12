@@ -53,7 +53,7 @@ class WhizzBot:
         return cls.__instance
 
     def __init__(self):
-        self.model = get_chain("TinyLlama-1.1B-Chat-v1.0")
+        self.model = get_chain("FineTuned-TinyLlama-1.1B-Chat-v1.0")
         if self.model is None:
             logger.error("Model initialization failed")
             raise RuntimeError("Model initialization failed")
