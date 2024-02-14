@@ -5,7 +5,7 @@ import uvicorn
 
 app = FastAPI()
 
-
+# Data models
 class PredictionRequest(BaseModel):
     query: str
     temp: float
@@ -18,11 +18,12 @@ class DataPathRequest(BaseModel):
     data_path: str
 
 
-# Dependency
+# Dependency Injection
 def get_whizzbot():
     return WhizzBot()
 
 
+# Routes
 @app.post("/predict")
 def make_prediction(request: PredictionRequest, whizzbot: WhizzBot = Depends(get_whizzbot)):
     try:

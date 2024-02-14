@@ -31,6 +31,8 @@ console_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
+
+# Function to initialize chain
 def get_chain(model_path):
     try:
         start_time = time.time()
@@ -44,9 +46,13 @@ def get_chain(model_path):
         logger.error(f"Error in get_chain: {e}")
         return None
 
+
+# Singleton class for WhizzBot
 class WhizzBot:
     __instance = None
 
+
+    # Singleton constructor
     def __new__(cls):
         if cls.__instance is None:
             cls.__instance = super(WhizzBot, cls).__new__(cls)
@@ -67,6 +73,8 @@ class WhizzBot:
         except Exception as e:
             logger.warning(f"Embeddings loading failed: {e}")
 
+
+    # Function to load embeddings
     def load_embeddings(self):
         try:
             logger.info("*** Loading existing embeddings")
@@ -77,6 +85,8 @@ class WhizzBot:
             logger.error(f"Error in load_embeddings: {e}")
             raise
 
+
+    # Function to create embeddings
     def _create_embeddings(self):
         try:
             text_chunks = self._text_chunks()
@@ -89,6 +99,8 @@ class WhizzBot:
             logger.error(f"Error in _create_embeddings: {e}")
             raise
 
+
+    # Function to read text
     def _read_text(self):
         try:
             text = read_documents_from_directory(self.data_path)
@@ -97,6 +109,8 @@ class WhizzBot:
             logger.error(f"Error in _read_text: {e}")
             raise
 
+
+    # Function to split text into chunks
     def _text_chunks(self):
         try:
             text = self._read_text()
@@ -108,6 +122,8 @@ class WhizzBot:
             logger.error(f"Error in _text_chunks: {e}")
             raise
 
+
+    # Function to set data path
     def set_data_path(self, new_path):
         if new_path != self.data_path:
             logger.info(f"*** Updating data path to {new_path}")
@@ -119,15 +135,21 @@ class WhizzBot:
                 logger.error(f"Error in set_data_path: {e}")
                 raise
 
+
+    # Function to get data path
     def get_data_path(self):
         return self.data_path
 
+
+    # Function to find documents
     def find_docs(self, query):
         start_time = time.time()
         docs = self.docsearch.similarity_search(query, k=1)
         logger.info(f"*** Similarity search time: {time.time() - start_time:.3f} seconds")
         return docs
 
+
+    # Function to predict
     def predict(self, query, temp, top_k, top_p, max_length):
         try:
             start_time = time.time()
