@@ -32,16 +32,30 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
 
+# Decorator to measure time
+def timeit(func):
+    def timed(*args, **kw):
+        start_time = time.time()
+        # Call the original function
+        result = func(*args, **kw)
+        end_time = time.time()
+        # Log the time it took
+        logger.info(f"*** {func.__name__} took {end_time - start_time:.3f} seconds")
+        return result
+
+    return timed
+
+
 # Function to initialize chain
+@timeit
 def get_chain(model_path):
     try:
-        start_time = time.time()
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model = AutoModelForCausalLM.from_pretrained(model_path)
         pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
         llm = HuggingFacePipeline(pipeline=pipe)
-        logger.info(f"*** Chain initialization time: {time.time() - start_time:.3f} seconds")
         return load_qa_chain(llm, chain_type="stuff")
+
     except Exception as e:
         logger.error(f"Error in get_chain: {e}")
         return None
@@ -50,7 +64,6 @@ def get_chain(model_path):
 # Singleton class for WhizzBot
 class WhizzBot:
     __instance = None
-
 
     # Singleton constructor
     def __new__(cls):
@@ -73,32 +86,29 @@ class WhizzBot:
         except Exception as e:
             logger.warning(f"Embeddings loading failed: {e}")
 
-
     # Function to load embeddings
+    @timeit
     def load_embeddings(self):
         try:
             logger.info("*** Loading existing embeddings")
-            start_time = time.time()
             self.docsearch = FAISS.load_local(self.embeddings_file, self.embedding_model)
-            logger.info(f"*** Loading Embedding time: {time.time() - start_time:.3f} seconds")
+
         except Exception as e:
             logger.error(f"Error in load_embeddings: {e}")
             raise
 
-
     # Function to create embeddings
+    @timeit
     def _create_embeddings(self):
         try:
             text_chunks = self._text_chunks()
-            start_time = time.time()
             self.docsearch = FAISS.from_texts(text_chunks, self.embedding_model)
-            logger.info(f"*** Creating Embedding time: {time.time() - start_time:.3f} seconds")
             self.docsearch.save_local(self.embeddings_file)
             logger.info("*** Embeddings saved")
+
         except Exception as e:
             logger.error(f"Error in _create_embeddings: {e}")
             raise
-
 
     # Function to read text
     def _read_text(self):
@@ -108,7 +118,6 @@ class WhizzBot:
         except Exception as e:
             logger.error(f"Error in _read_text: {e}")
             raise
-
 
     # Function to split text into chunks
     def _text_chunks(self):
@@ -122,7 +131,6 @@ class WhizzBot:
             logger.error(f"Error in _text_chunks: {e}")
             raise
 
-
     # Function to set data path
     def set_data_path(self, new_path):
         if new_path != self.data_path:
@@ -135,29 +143,24 @@ class WhizzBot:
                 logger.error(f"Error in set_data_path: {e}")
                 raise
 
-
     # Function to get data path
     def get_data_path(self):
         return self.data_path
 
-
     # Function to find documents
+    @timeit
     def find_docs(self, query):
-        start_time = time.time()
         docs = self.docsearch.similarity_search(query, k=1)
-        logger.info(f"*** Similarity search time: {time.time() - start_time:.3f} seconds")
         return docs
 
-
     # Function to predict
+    @timeit
     def predict(self, query, temp, top_k, top_p, max_length):
         try:
-            start_time = time.time()
             docs = self.find_docs(query)  # Assuming find_docs is a method of the bot class
             logger.info(f"*** Starting prediction")
             response = self.model.invoke({"input_documents": docs, "question": query, "max_length": max_length,
                                           "temperature": temp, "top_k": top_k, "top_p": top_p})
-            logger.info(f"*** Prediction time: {time.time() - start_time:.3f} seconds")
             return response['output_text']
         except Exception as e:
             logger.error(f"Error in predict: {e}")
