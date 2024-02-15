@@ -11,11 +11,6 @@ __pycache__/
 /App/.idea
 /App/.venv
 
-# API
-/App/WhizzbotAPI/data/
-/App/backend/faiss_embeddings/
-/App/WhizzbotAPI/TinyLlama-1.1B-Chat-v1.0/
-
 # Distribution / packaging
 .Python
 build/
