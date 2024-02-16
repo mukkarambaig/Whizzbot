@@ -1,12 +1,18 @@
+'''
+API for the WhizzBot model. The API is built using FastAPI and the WhizzBot model is used to make predictions.
+'''
+
+# Importing required libraries
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from whizzbot import WhizzBot
 import uvicorn
 
+# Creating FastAPI app
 app = FastAPI()
 
-# Data models
 class PredictionRequest(BaseModel):
+    ''' Request body for the prediction endpoint '''
     query: str
     temp: float
     top_k: int
@@ -15,15 +21,19 @@ class PredictionRequest(BaseModel):
 
 
 class DataPathRequest(BaseModel):
+    ''' Request body for the set_data_path endpoint '''
     data_path: str
 
 
 # Dependency Injection
 def get_whizzbot():
+    ''' Dependency Injection for the WhizzBot model '''
     return WhizzBot()
 
 
 # Routes
+
+''' Make predictions using the WhizzBot model '''
 @app.post("/predict")
 def make_prediction(request: PredictionRequest, whizzbot: WhizzBot = Depends(get_whizzbot)):
     try:
@@ -39,6 +49,7 @@ def make_prediction(request: PredictionRequest, whizzbot: WhizzBot = Depends(get
         return {"error": str(e)}
 
 
+''' Load data into the WhizzBot model '''
 @app.get("/load_data")
 def load_data(whizzbot: WhizzBot = Depends(get_whizzbot)):
     try:
@@ -48,6 +59,7 @@ def load_data(whizzbot: WhizzBot = Depends(get_whizzbot)):
         return {"error": str(e)}
 
 
+''' Set the data path for the WhizzBot model '''
 @app.put("/set_data_path")
 def set_data_path(request: DataPathRequest, whizzbot: WhizzBot = Depends(get_whizzbot)):
     try:

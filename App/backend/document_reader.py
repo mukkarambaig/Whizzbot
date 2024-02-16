@@ -1,12 +1,16 @@
+'''
+Helper functions to read data from documents
+'''
+
+# Importing required libraries
 import os
 from PyPDF2 import PdfReader
 import pandas as pd
 import docx
 
 
-############ TEXT LOADERS ############
-# PDF reader function
 def read_pdf(file_path):
+    ''' Read text from a PDF file '''
     with open(file_path, "rb") as file:
         pdf_reader = PdfReader(file)
         text = ""
@@ -15,8 +19,8 @@ def read_pdf(file_path):
     return text
 
 
-# Word reader function
 def read_word(file_path):
+    ''' Read text from a Word file '''
     doc = docx.Document(file_path)
     text = ""
     for paragraph in doc.paragraphs:
@@ -24,27 +28,27 @@ def read_word(file_path):
     return text
 
 
-# Text reader function
 def read_txt(file_path):
+    ''' Read text from a text file '''
     with open(file_path, "r") as file:
         text = file.read()
     return text
 
 
-# CSV reader function
 def read_csv(file_path):
+    ''' Read text from a CSV file '''
     df = pd.read_csv(file_path)
     return df.to_string()
 
 
-# Excel reader function
 def read_excel(file_path):
+    ''' Read text from an Excel file '''
     df = pd.read_excel(file_path)
     return df.to_string()
 
 
-# Directory reader function
 def read_documents_from_directory(directory):
+    ''' Read text from all documents in a directory '''
     file_handlers = {
         '.pdf': read_pdf,
         '.docx': read_word,

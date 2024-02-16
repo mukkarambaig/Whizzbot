@@ -10,7 +10,7 @@ from urllib.parse import quote
 
 ########### Constants ###########
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://7ace-34-142-194-206.ngrok-free.app" #"http://127.0.0.1:8000"
 PREDICT_ENDPOINT = "/predict"
 LOAD_DATA_ENDPOINT = "/load_data"
 SET_DATA_PATH_ENDPOINT = "/set_data_path"
@@ -34,7 +34,7 @@ def make_prediction(query, temp, top_k, top_p, max_length):
         return response.json().get("prediction", "")
     else:
         st.error(f"Error in prediction: {response.status_code}")
-        return None
+        return "Unable to use the model"
 
 
 # Function for loading existing data
@@ -133,8 +133,8 @@ with st.sidebar:
 
     st.subheader("Parameters")
     temperature = st.sidebar.slider('temperature', min_value=0.01, max_value=1.0, value=0.2, step=0.01)
-    top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.3, step=0.01)
-    top_k = st.sidebar.slider('top_k', min_value=10, max_value=50, value=10, step=1)
+    top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
+    top_k = st.sidebar.slider('top_k', min_value=10, max_value=50, value=20, step=1)
     max_length = st.sidebar.slider('max_length', min_value=32, max_value=1024, value=32, step=8)
 
 # Store LLM generated responses

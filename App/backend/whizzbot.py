@@ -1,4 +1,8 @@
-import os
+'''
+WhizzBot singleton class
+'''
+
+# Import the required libraries
 import time
 import logging
 
@@ -32,8 +36,8 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
 
-# Decorator to measure time
 def timeit(func):
+    ''' Decorator to measure the time a function takes '''
     def timed(*args, **kw):
         start_time = time.time()
         # Call the original function
@@ -46,9 +50,9 @@ def timeit(func):
     return timed
 
 
-# Function to initialize chain
 @timeit
 def get_chain(model_path):
+    ''' Function to get the language model chain '''
     try:
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model = AutoModelForCausalLM.from_pretrained(model_path)
@@ -61,17 +65,19 @@ def get_chain(model_path):
         return None
 
 
-# Singleton class for WhizzBot
 class WhizzBot:
+    ''' Singleton class for the WhizzBot '''
     __instance = None
 
-    # Singleton constructor
+
     def __new__(cls):
+        ''' Singleton instance '''
         if cls.__instance is None:
             cls.__instance = super(WhizzBot, cls).__new__(cls)
         return cls.__instance
 
     def __init__(self):
+        ''' Initialize the WhizzBot '''
         self.model = get_chain("FineTuned-TinyLlama-1.1B-Chat-v1.0")
         if self.model is None:
             logger.error("Model initialization failed")
@@ -86,9 +92,9 @@ class WhizzBot:
         except Exception as e:
             logger.warning(f"Embeddings loading failed: {e}")
 
-    # Function to load embeddings
     @timeit
     def load_embeddings(self):
+        ''' Load embeddings from file '''
         try:
             logger.info("*** Loading existing embeddings")
             self.docsearch = FAISS.load_local(self.embeddings_file, self.embedding_model)
@@ -97,9 +103,9 @@ class WhizzBot:
             logger.error(f"Error in load_embeddings: {e}")
             raise
 
-    # Function to create embeddings
     @timeit
     def _create_embeddings(self):
+        ''' Create embeddings from the data '''
         try:
             text_chunks = self._text_chunks()
             self.docsearch = FAISS.from_texts(text_chunks, self.embedding_model)
@@ -110,8 +116,8 @@ class WhizzBot:
             logger.error(f"Error in _create_embeddings: {e}")
             raise
 
-    # Function to read text
     def _read_text(self):
+        ''' Read text from the data path '''
         try:
             text = read_documents_from_directory(self.data_path)
             return text
@@ -119,8 +125,8 @@ class WhizzBot:
             logger.error(f"Error in _read_text: {e}")
             raise
 
-    # Function to split text into chunks
     def _text_chunks(self):
+        ''' Split the text into chunks '''
         try:
             text = self._read_text()
             char_text_splitter = CharacterTextSplitter(separator=" ", chunk_size=1000,
@@ -131,8 +137,8 @@ class WhizzBot:
             logger.error(f"Error in _text_chunks: {e}")
             raise
 
-    # Function to set data path
     def set_data_path(self, new_path):
+        ''' Set the data path and reinitialize the embeddings '''
         if new_path != self.data_path:
             logger.info(f"*** Updating data path to {new_path}")
             self.data_path = new_path
@@ -143,19 +149,19 @@ class WhizzBot:
                 logger.error(f"Error in set_data_path: {e}")
                 raise
 
-    # Function to get data path
     def get_data_path(self):
+        ''' Get the data path '''
         return self.data_path
 
-    # Function to find documents
     @timeit
     def find_docs(self, query):
+        ''' Find the most similar documents to the query '''
         docs = self.docsearch.similarity_search(query, k=1)
         return docs
 
-    # Function to predict
     @timeit
     def predict(self, query, temp, top_k, top_p, max_length):
+        ''' Make a prediction using the model '''
         try:
             docs = self.find_docs(query)  # Assuming find_docs is a method of the bot class
             logger.info(f"*** Starting prediction")
