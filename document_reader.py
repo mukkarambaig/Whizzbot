@@ -4,10 +4,10 @@ Helper functions to read data from documents
 
 # Importing required libraries
 import os
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 import pandas as pd
 import docx
-
+from tqdm import tqdm
 
 def read_pdf(file_path):
     ''' Read text from a PDF file '''
@@ -59,7 +59,7 @@ def read_documents_from_directory(directory):
     }
 
     texts = []
-    for filename in os.listdir(directory):
+    for filename in tqdm(os.listdir(directory)):
         file_path = os.path.join(directory, filename)
         file_extension = os.path.splitext(filename)[1].lower()
 
@@ -71,3 +71,6 @@ def read_documents_from_directory(directory):
                 print(f"Error reading {filename}: {e}")
 
     return '\n'.join(texts)
+
+if __name__ == "__main__":
+    print(read_documents_from_directory("data/documents"))

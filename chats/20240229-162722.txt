@@ -1,0 +1,11 @@
+[2024-02-29 16:27:22] ASSISTANT: How may I assist you today?
+[2024-02-29 16:27:22] USER: Which eye hospital I can consult in Lahore?
+[2024-02-29 16:27:22] ASSISTANT:  Based on the provided documents, you can consult the following eye hospitals in Lahore:
+
+1. Hafeez Eye Centre (2 campuses) - Jallo More, Lahore
+2. Iqraa Medical Complex - 5-A, Jauhar Town (Near Akbar Chowk)
+3. Ittefaq Hospital Trust - Near H Block, New Model Town
+4. Laser Vision Centre - 95 - K, Model Town, Lahore
+5. Masood Hospital - 99 Garden Block, Garden Town, Lahore
+
+Please note that this list is not exhaustive and there may be other eye hospitals in Lahore that are not mentioned in the provided documents. It is always advisable to consult with a medical professional for personalized recommendations and advice.

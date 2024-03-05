@@ -1,0 +1,3 @@
+[2024-02-27 15:35:39] ASSISTANT: How may I assist you today?
+[2024-02-27 15:35:39] USER: hello
+[2024-02-27 15:35:39] ASSISTANT: Testing
