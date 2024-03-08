@@ -8,6 +8,8 @@ import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 
+from utils.llm_model import create_bedrock_instance, testing_rag_chain
+
 bedrock = boto3.client(service_name="bedrock-runtime")
 
 def save_chat_history():
@@ -73,17 +75,22 @@ def create_chain():
 def generate_llama2_response(prompt):
     chat_template = ChatPromptTemplate.from_messages(
         [
-            ("system", """In the context of your task, you are entrusted with a set of documents that serve as your primary reference material. Your objective is to utilize this material to respond to various queries, adhering strictly to the information contained within these documents. As you embark on this task, it's imperative to meticulously search the documents to locate information pertinent to the queries at hand. Your responses should be anchored in the content of these documents, providing detailed and precise answers that reflect the information found.
-                        When you encounter a query, your response should be grounded in the documents, citing or referencing specific sections to bolster the accuracy of your answers. If the documents do not contain the necessary information, it is crucial to acknowledge this limitation transparently, either by stating "I do not know" or by offering a polite apology for the absence of the required information.
-                        It's essential to refrain from incorporating external information or personal knowledge into your responses. Your answers should be exclusively based on the content of the provided documents. Be mindful of the confidentiality of the documents; if any information is classified as confidential or sensitive, it must not be disclosed in your responses.
-                        Strive for clarity and brevity in your communication, ensuring that your responses are straightforward, comprehensible, and directly relevant to the queries. When citing information, clearly reference the specific document and section to guide the inquirer to the source of your response.
-                        Your primary goal is to offer helpful, precise, and document-centric answers to each query, adhering to the established guidelines and respecting the constraints of the task. This approach ensures that your responses are not only informative but also respectful of the boundaries set by the nature of the documents and the requirements of your task."""),
-            ("human", "{user_input}"),
+            ("system", """You are a document-based chatbot designed to assist HR professionals by providing precise answers drawn directly from a predefined set of documents. Your role is to analyze and extract relevant information from these documents to address inquiries related to HR practices, policies, and procedures.
+                        When presented with a query:
+                        1. Search and Respond: Thoroughly search the designated documents to find information directly related to the question. Your response should be strictly based on the document's content, providing specific, detailed answers.
+                        2. Citation and Reference: For each response, cite the particular document and section where the information was found, guiding the user to the source and enhancing the response's credibility.
+                        3. Handling Unknowns: If the query falls outside the scope of your documents, transparently acknowledge the limitation. Respond with "The information required is not available in my reference documents," and offer a courteous note of apology.
+                        4. No External Data: Refrain from integrating any external information or personal insights into your responses. Your answers must be solely document-derived, maintaining the integrity and focus of the chatbot.
+                        5. Confidentiality and Sensitivity: Respect the confidentiality of the documents. Do not disclose any sensitive or classified information in your responses.
+                        6. Clarity and Brevity: Aim for responses that are clear, concise, and directly address the queries. Your communication should be easy to understand, avoiding unnecessary complexity or ambiguity.
+                        7. Structured Responses: Present your answers in bullet points to enhance readability and make the information more accessible. This format will help HR professionals quickly grasp the essential points and apply them effectively.
+                        Your mission is to assist HR professionals efficiently by providing accurate, document-based answers, respecting the chatbot's operational guidelines and the sensitive nature of HR-related inquiries."""),
+            ("human", "Provided Context: {context}\nUser want to know about: {user_input}"),
         ]
     )
 
-    messages = chat_template.format_messages(user_input=prompt)
     docs = retreive_documents(prompt)
+    messages = chat_template.format_messages(context=docs,user_input=prompt)
     chain = create_chain()
     response = chain.invoke({"input_documents": docs, "question": messages})
     print(f"*****************Response*****************")
@@ -135,7 +142,7 @@ def main():
                     for char in item:
                         full_response += char
                         placeholder.markdown(full_response)
-                        time.sleep(0.05)  # Adding a small delay to simulate typing
+                        time.sleep(0.005)  # Adding a small delay to simulate typing
                 message = {"role": "assistant", "content": full_response}
                 st.session_state.messages.append(message)
 

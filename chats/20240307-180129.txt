@@ -1,0 +1,16 @@
+[2024-03-07 18:01:29] ASSISTANT: How may I assist you today?
+[2024-03-07 18:01:29] USER: What if i come late, will my salary be deducted
+[2024-03-07 18:01:29] ASSISTANT: 
+Based on the provided context, if you come late, your attendance will be marked as late, and you may be subject to deductions from your salary as per the company's attendance policy. Specifically, for every two late comings (consecutive or with intervals), a full-day annual leave shall be deducted from your account, and this will multiply in the same manner for the whole month. Additionally, if you arrive after one hour of your roster timing, it will be considered as a Full Day Leave if not applied for Short Leave. It is essential to notify your line manager of your late arrival or absence in advance, as failure to do so may result in disciplinary action. To avoid any deductions from your salary, it is advisable to plan your commute and arrive on time.
+
+Please let me know if you have any other questions or if there's anything else I can help you with.
+[2024-03-07 18:01:29] USER: how many leave do I have in this year. 
+[2024-03-07 18:01:29] ASSISTANT: 
+
+Based on the provided context, I can assist you with information related to attendance and leave policies. To answer your question, "how many leave do I have in this year?" I would need to know your current leave balance for the year.
+
+According to the provided context, you are entitled to 45 hours of work per week, and you have a leave balance of 20 days per year. However, if you have already consumed some of your leaves, your current balance may be less than 20 days.
+
+To check your current leave balance, you can refer to your HR department or log in to your service portal to view your leave balance. Your line manager can also provide you with this information.
+
+Please note that any leave taken without proper approval or documentation may be considered as unauthorized absence, and may result in disciplinary action. Therefore, it is essential to follow the proper procedures for requesting leave and obtaining approval before taking any leave.
