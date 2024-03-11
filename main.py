@@ -104,8 +104,8 @@ def main():
     for key in st.session_state.keys():
         print(key)
     with st.sidebar:
-        st.title('💬 Whizzbridge HR Chatbot')
-
+        st.title('💬 Whizzbridge HR Chatbot 13B')
+	st.write("Version 2.0")
         if "docsearch" not in st.session_state.keys():
             load_knowledge_base()
 
