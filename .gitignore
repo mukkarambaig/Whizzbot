@@ -3,3 +3,7 @@
 
 # Ignore data directory
 data/
+
+.env
+
+__pycache__/

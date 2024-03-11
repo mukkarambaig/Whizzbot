@@ -2,13 +2,11 @@ import os
 from datetime import datetime
 import time
 import boto3
-from vector_stores import load_vector_embeddings, create_vector_embeddings
+from src.vector_stores import load_vector_embeddings, create_vector_embeddings
 from langchain.llms.bedrock import Bedrock
 import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.question_answering import load_qa_chain
-
-from utils.llm_model import create_bedrock_instance, testing_rag_chain
 
 bedrock = boto3.client(service_name="bedrock-runtime")
 
