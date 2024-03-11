@@ -10,13 +10,13 @@ from langchain_core.runnables import RunnablePassthrough
 load_dotenv()
 
 # Constants
-SERVICE_NAME = os.getenv("SERVICE_NAME", "bedrock-runtime")
-REGION_NAME = os.getenv("AWS_REGION", "us-east-1")
-MODEL_ID = os.getenv("MODEL_ID", "meta.llama2-13b-chat-v1")
+SERVICE_NAME = os.getenv("SERVICE_NAME")
+REGION_NAME = os.getenv("AWS_REGION")
+MODEL_ID = os.getenv("MODEL_ID")
 STREAMING = os.getenv("STREAMING", "True").lower() == 'true'  # Convert to boolean
-MAX_GEN_LEN = int(os.getenv("MAX_GEN_LEN", "512"))  # Convert to integer
-TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))  # Convert to float
-TOP_P = float(os.getenv("TOP_P", "0.9"))  # Convert to float
+MAX_GEN_LEN = int(os.getenv("MAX_GEN_LEN",))  # Convert to integer
+TEMPERATURE = float(os.getenv("TEMPERATURE"))  # Convert to float
+TOP_P = float(os.getenv("TOP_P"))  # Convert to float
 
 def initialize_boto3_client(service_name: str = SERVICE_NAME, region_name: str = REGION_NAME):
     """Initialize and return a boto3 client for the specified service and region."""
