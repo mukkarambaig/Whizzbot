@@ -1,4 +1,0 @@
-[2024-02-29 15:52:58] ASSISTANT: How may I assist you today?
-[2024-02-29 15:52:58] USER: What is the attendance policy at Whizzbridge?
-[2024-02-29 15:52:58] ASSISTANT: 
-I do not know. The provided documents do not contain information regarding attendance policies at Whizzbridge.
