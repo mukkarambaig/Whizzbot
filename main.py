@@ -100,7 +100,8 @@ def generate_llama2_response(prompt):
 
 def main():
     """Main function to set up the Streamlit app."""
-    st.set_page_config(page_title="💬 Whizzbridge HR Chatbot")
+    st.set_page_config(page_title="💬 Whizzbridge HR Chatbot 13B")
+    st.write("Version 2.0")
     for key in st.session_state.keys():
         print(key)
     with st.sidebar:
