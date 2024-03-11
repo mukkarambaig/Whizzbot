@@ -6,53 +6,41 @@ from langchain.llms.bedrock import Bedrock
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
-# Load environment variables
-load_dotenv()
+class BedrockManager:
+    def __init__(self):
+        # Load environment variables
+        load_dotenv()
 
-# Constants
-SERVICE_NAME = os.getenv("SERVICE_NAME")
-REGION_NAME = os.getenv("AWS_REGION")
-MODEL_ID = os.getenv("MODEL_ID")
-STREAMING = os.getenv("STREAMING",
-                      "True").lower() == 'true'  # Convert to boolean
-MAX_GEN_LEN = int(os.getenv("MAX_GEN_LEN", ))  # Convert to integer
-TEMPERATURE = float(os.getenv("TEMPERATURE"))  # Convert to float
-TOP_P = float(os.getenv("TOP_P"))  # Convert to float
+        # Initialize constants from environment variables
+        self.service_name = os.getenv("SERVICE_NAME", "bedrock-runtime")
+        self.region_name = os.getenv("AWS_REGION", "us-east-1")
+        self.model_id = os.getenv("MODEL_ID", "meta.llama2-13b-chat-v1")
+        self.streaming = os.getenv("STREAMING", "True").lower() == 'true'
+        self.max_gen_len = int(os.getenv("MAX_GEN_LEN", "512"))
+        self.temperature = float(os.getenv("TEMPERATURE", "0.2"))
+        self.top_p = float(os.getenv("TOP_P", "0.9"))
 
+        self.client = self.initialize_boto3_client()
+        self.bedrock_instance = self.create_bedrock_instance(self.client)
 
-def initialize_boto3_client(service_name: str = SERVICE_NAME,
-                            region_name: str = REGION_NAME):
-    """Initialize and return a boto3 client for the specified service and region."""
-    return boto3.client(service_name=service_name, region_name=region_name)
+    def initialize_boto3_client(self):
+        """Initialize and return a boto3 client for the specified service and region."""
+        return boto3.client(service_name=self.service_name, region_name=self.region_name)
 
+    def create_bedrock_instance(self, client):
+        """Create and return a Bedrock instance with the specified parameters."""
+        return Bedrock(model_id=self.model_id, client=client, streaming=self.streaming,
+                       callbacks=[StreamingStdOutCallbackHandler()],
+                       model_kwargs={'max_gen_len': self.max_gen_len, 
+                                     'temperature': self.temperature, 
+                                     'top_p': self.top_p})
 
-def create_bedrock_instance(client,
-                            model_id: str = MODEL_ID,
-                            streaming: bool = STREAMING,
-                            max_gen_len: int = MAX_GEN_LEN,
-                            temperature: float = TEMPERATURE,
-                            top_p: float = TOP_P):
-    """Create and return a Bedrock instance with the specified parameters."""
+    @staticmethod
+    def format_docs(docs):
+        """Format and return document contents."""
+        return "\n\n".join(doc.page_content for doc in docs)
 
-    return Bedrock(model_id=model_id,
-                   client=client,
-                   streaming=streaming,
-                   callbacks=[StreamingStdOutCallbackHandler()],
-                   model_kwargs={
-                       'max_gen_len': max_gen_len,
-                       'temperature': temperature,
-                       'top_p': top_p
-                   })
-
-
-def format_docs(docs):
-    """Format and return document contents."""
-    return "\n\n".join(doc.page_content for doc in docs)
-
-
-def initialize_rag_chain(retriever, prompt, llm):
-    """Initialize and return a RAG chain with the specified components."""
-    return ({
-        "context": retriever | format_docs,
-        "question": RunnablePassthrough()
-    } | prompt | llm | StrOutputParser())
+    def initialize_rag_chain(self, retriever, prompt, llm):
+        """Initialize and return a RAG chain with the specified components."""
+        return ({"context": retriever | self.format_docs, "question": RunnablePassthrough()} 
+                | prompt | llm | StrOutputParser())

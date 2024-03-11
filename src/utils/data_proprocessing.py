@@ -3,22 +3,9 @@ from typing import List
 import os
 
 # Third-party modules
-from dotenv import load_dotenv
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
-
-# Custom modules
-from document_loader import read_unstructured_data
-
-# Initialize environment variables
-load_dotenv()
-DOCUMENT_DIR = os.getenv("DOCUMENT_DIR")
-EMBEDDINGS_DIR = os.getenv("EMBEDDINGS_DIR")
-HF_API_KEY = os.getenv("HF_API_KEY")
-CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "100"))  # Providing default values
-CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "20"))
-EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "default-model-name")
 
 
 class TextSplitter:
@@ -54,9 +41,28 @@ class VectorStoreManager:
         """Load and return a FAISS vectorstore from a path."""
         return FAISS.load_local(vectorstore_path,
                                 embeddings=self.embedding_model)
+    
+    def get_vectorstore_retriever(self, vectorstore):
+        """Return the vectorstore as a retriever."""
+        return vectorstore.as_retriever()
 
 
 def main():
+    from dotenv import load_dotenv
+    from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+    
+    # Custom modules
+    from document_loader import read_unstructured_data
+    
+    # Initialize environment variables
+    load_dotenv()
+    DOCUMENT_DIR = os.getenv("DOCUMENT_DIR")
+    EMBEDDINGS_DIR = os.getenv("EMBEDDINGS_DIR")
+    HF_API_KEY = os.getenv("HF_API_KEY")
+    CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "100"))  # Providing default values
+    CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "20"))
+    EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "default-model-name")
+    
     embedding_model = HuggingFaceInferenceAPIEmbeddings(
         api_key=HF_API_KEY, model_name=EMBEDDING_MODEL_NAME)
     text_splitter = TextSplitter(CHUNK_SIZE, CHUNK_OVERLAP)
