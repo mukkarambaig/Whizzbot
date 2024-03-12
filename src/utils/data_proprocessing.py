@@ -3,7 +3,7 @@ from typing import List
 import os
 
 # Third-party modules
-
+from transformers import AutoTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 
@@ -11,11 +11,10 @@ from langchain_community.vectorstores import FAISS
 class TextSplitter:
     """Utility class to split text into chunks."""
 
-    def __init__(self, chunk_size: int, chunk_overlap: int):
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
-        self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
+    def __init__(self, chunk_size: int, chunk_overlap: int, tokenizer: str):
+        self.text_splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
+            AutoTokenizer.from_pretrained(tokenizer),
+            chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
     def split(self, text: str) -> List[str]:
         """Split the text into chunks."""
