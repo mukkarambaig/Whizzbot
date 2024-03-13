@@ -4,8 +4,8 @@ import boto3
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.bedrock import Bedrock
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from icecream import ic
 class BedrockManager:
     def __init__(self):
         # Load environment variables
@@ -37,5 +37,5 @@ class BedrockManager:
 
     def initialize_rag_chain(self, retriever, prompt, llm):
         """Initialize and return a RAG chain with the specified components."""
-        return ({"context": retriever, "question": RunnablePassthrough()} 
+        return (RunnableParallel({"context": retriever, "question": RunnablePassthrough()}) 
                 | prompt | llm | StrOutputParser())

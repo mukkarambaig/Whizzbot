@@ -137,6 +137,7 @@ def streamlit_app():
         if "llm" not in st.session_state.keys():
             st.session_state['llm'] = bedrock_manager.create_bedrock_instance(
                 st.session_state['boto3_client'])
+            
 
         # Initialize Retriever
         if "retreiver" not in st.session_state.keys():
@@ -151,6 +152,7 @@ def streamlit_app():
                     st.session_state['retreiver'], prompt_template,
                     st.session_state['llm'])
             st.success("Chat is ready to use!", icon="🚀")
+
 
         # Reload the knowledge base
         st.button("Reload Knowledge Base", on_click=reload_knowledge_base)
