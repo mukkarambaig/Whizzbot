@@ -7,7 +7,9 @@ from datetime import datetime
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
-from langchain_core.prompts import ChatPromptTemplate
+from langchain.prompts import ChatPromptTemplate
+
+
 
 # Custom modules
 from utils.data_preprocessing import TextSplitter, VectorStoreManager
@@ -26,6 +28,7 @@ CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "100"))  # Providing default values
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "20"))
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "default-model-name")
 
+
 # Initialize the objects
 embedding_model = HuggingFaceInferenceAPIEmbeddings(
     api_key=HF_API_KEY, model_name=EMBEDDING_MODEL_NAME)
@@ -34,22 +37,22 @@ vectorstore_manager = VectorStoreManager(embedding_model)
 bedrock_manager = BedrockManager()
 
 # Define the chatbot prompt
-prompt_template = ChatPromptTemplate.from_messages([
-    ("system",
-     """You are a document-based chatbot designed to assist HR professionals by providing precise answers drawn directly from a predefined set of documents. Your role is to analyze and extract relevant information from these documents to address inquiries related to HR practices, policies, and procedures.
-                    When presented with a query:
-                    1. Search and Respond: Thoroughly search the designated documents to find information directly related to the question. Your response should be strictly based on the document's content, providing specific, detailed answers.
-                    2. Citation and Reference: For each response, cite the particular document and section where the information was found, guiding the user to the source and enhancing the response's credibility.
-                    3. Handling Unknowns: If the query falls outside the scope of your documents, transparently acknowledge the limitation. Respond with "The information required is not available in my reference documents," and offer a courteous note of apology.
-                    4. No External Data: Refrain from integrating any external information or personal insights into your responses. Your answers must be solely document-derived, maintaining the integrity and focus of the chatbot.
-                    5. Confidentiality and Sensitivity: Respect the confidentiality of the documents. Do not disclose any sensitive or classified information in your responses.
-                    6. Clarity and Brevity: Aim for responses that are clear, concise, and directly address the queries. Your communication should be easy to understand, avoiding unnecessary complexity or ambiguity.
-                    7. Structured Responses: Present your answers in bullet points to enhance readability and make the information more accessible. This format will help HR professionals quickly grasp the essential points and apply them effectively.
-                    Your mission is to assist HR professionals efficiently by providing accurate, document-based answers, respecting the chatbot's operational guidelines and the sensitive nature of HR-related inquiries."""
-     ),
-    ("human",
-     "Provided Context: {context}\nUser want to know about: {user_input}"),
-])
+prompt_template = ChatPromptTemplate.from_messages(
+        [
+            ("system", """You are a document-based chatbot designed to assist HR professionals by providing precise answers drawn directly from a predefined set of documents. Your role is to analyze and extract relevant information from these documents to address inquiries related to HR practices, policies, and procedures.
+                When presented with a query:
+                1. Search and Respond: Thoroughly search the designated documents to find information directly related to the question. Your response should be strictly based on the document's content, providing specific, detailed answers.
+                2. Citation and Reference: For each response, cite the particular document and section where the information was found, guiding the user to the source and enhancing the response's credibility.
+                3. Handling Unknowns: If the query falls outside the scope of your documents, transparently acknowledge the limitation. Respond with "The information required is not available in my reference documents," and offer a courteous note of apology.
+                4. No External Data: Refrain from integrating any external information or personal insights into your responses. Your answers must be solely document-derived, maintaining the integrity and focus of the chatbot.
+                5. Confidentiality and Sensitivity: Respect the confidentiality of the documents. Do not disclose any sensitive or classified information in your responses.
+                6. Clarity and Brevity: Aim for responses that are clear, concise, and directly address the queries. Your communication should be easy to understand, avoiding unnecessary complexity or ambiguity.
+                7. Structured Responses: Present your answers in bullet points to enhance readability and make the information more accessible. This format will help HR professionals quickly grasp the essential points and apply them effectively.
+                Your mission is to assist HR professionals efficiently by providing accurate, document-based answers, respecting the chatbot's operational guidelines and the sensitive nature of HR-related inquiries."""),
+            ("human", "Provided Context: {context}\nUser want to know about: {question}"),
+        ]
+    )
+
 
 def show_documents():
     """Show the documents in the knowledge base."""
@@ -103,7 +106,8 @@ def reload_knowledge_base():
     vectorstore_manager.save_vectorstore(vectorstore, EMBEDDINGS_DIR)
 
     # Load FAISS vectorstore
-    st.session_state['docsearch'] = vectorstore_manager.load_vectorstore(EMBEDDINGS_DIR)
+    st.session_state['docsearch'] = vectorstore_manager.load_vectorstore(
+        EMBEDDINGS_DIR)
 
     # Notify the user
     st.success(f'Knowledge Base reloaded from {DOCUMENT_DIR}')
@@ -117,20 +121,35 @@ def streamlit_app():
         st.title('💬 Whizzbridge HR Chatbot 13B')
         st.write("Version 2.0")
 
+        # Load the knowledge base
         if "docsearch" not in st.session_state.keys():
-            st.session_state['docsearch'] = vectorstore_manager.load_vectorstore(EMBEDDINGS_DIR)
-            
-            st.success("Knowledge Base Loaded!", icon="✅") # Notify the user
-        
+            st.session_state[
+                'docsearch'] = vectorstore_manager.load_vectorstore(
+                    EMBEDDINGS_DIR)
+
+            st.success("Knowledge Base Loaded!", icon="✅")  # Notify the user
+
+        # Initialize Boto3 client
         if "boto3_client" not in st.session_state.keys():
-            st.session_state['boto3_client'] = bedrock_manager.initialize_boto3_client()
-        
+            st.session_state[
+                'boto3_client'] = bedrock_manager.initialize_boto3_client()
+
+        if "llm" not in st.session_state.keys():
+            st.session_state['llm'] = bedrock_manager.create_bedrock_instance(
+                st.session_state['boto3_client'])
+
+        # Initialize Retriever
         if "retreiver" not in st.session_state.keys():
-            st.session_state['retreiver'] = vectorstore_manager.get_vectorstore_retriever(st.session_state['docsearch'])
-        
+            st.session_state[
+                'retreiver'] = vectorstore_manager.get_vectorstore_retriever(
+                    st.session_state['docsearch'])
+
+        # Initialize RAG chain
         if "rag_chain" not in st.session_state.keys():
-            st.session_state['rag_chain'] = bedrock_manager.initialize_rag_chain(st.session_state['retreiver'], prompt_template, bedrock_manager.create_bedrock_instance(st.session_state['boto3_client']))
-            ic(st.session_state['rag_chain'])
+            st.session_state[
+                'rag_chain'] = bedrock_manager.initialize_rag_chain(
+                    st.session_state['retreiver'], prompt_template,
+                    st.session_state['llm'])
             st.success("Chat is ready to use!", icon="🚀")
 
         # Reload the knowledge base
@@ -157,7 +176,7 @@ def streamlit_app():
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    if prompt := st.chat_input(placeholder="Type a message...", ):
+    if prompt := st.chat_input(placeholder="Type a message..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.write(prompt)
@@ -166,7 +185,7 @@ def streamlit_app():
     if st.session_state.messages[-1]["role"] != "assistant":
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = st.session_state['rag_chain'].invoke({"question": prompt})
+                response = st.session_state['rag_chain'].invoke(prompt)
                 placeholder = st.empty()
                 full_response = ''
                 for word in response:

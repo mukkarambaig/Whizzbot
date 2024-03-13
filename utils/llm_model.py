@@ -35,12 +35,7 @@ class BedrockManager:
                                      'temperature': self.temperature, 
                                      'top_p': self.top_p})
 
-    @staticmethod
-    def format_docs(docs):
-        """Format and return document contents."""
-        return "\n\n".join(doc.page_content for doc in docs)
-
     def initialize_rag_chain(self, retriever, prompt, llm):
         """Initialize and return a RAG chain with the specified components."""
-        return ({"context": retriever | self.format_docs, "question": RunnablePassthrough()} 
+        return ({"context": retriever, "question": RunnablePassthrough()} 
                 | prompt | llm | StrOutputParser())
