@@ -3,6 +3,7 @@ from typing import List
 import os
 
 # Third-party modules
+from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
@@ -43,7 +44,11 @@ class VectorStoreManager:
     
     def get_vectorstore_retriever(self, vectorstore):
         """Return the vectorstore as a retriever."""
-        return vectorstore.as_retriever()
+        return vectorstore.as_retriever(search_kwargs={"k": 6})
+    
+    def get_relevant_documents(self, vectorstore, query: str):
+        """Return the most relevant documents for a given query."""
+        return vectorstore.similarity_search(query, k=3)
 
 
 def main():

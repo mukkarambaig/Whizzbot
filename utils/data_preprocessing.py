@@ -45,6 +45,10 @@ class VectorStoreManager:
     def get_vectorstore_retriever(self, vectorstore):
         """Return the vectorstore as a retriever."""
         return vectorstore.as_retriever(search_kwargs={"k": 6})
+    
+    def get_relevant_documents(self, vectorstore, query: str):
+        """Return the most relevant documents for a given query."""
+        return vectorstore.similarity_search(query, k=3)
 
 
 def main():
