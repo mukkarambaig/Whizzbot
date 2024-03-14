@@ -27,6 +27,11 @@ class BedrockManager:
     def initialize_boto3_client(self):
         """Initialize and return a boto3 client for the specified service and region."""
         return boto3.client(service_name=self.service_name, region_name=self.region_name)
+    
+    def change_model(self, model_id):
+        """Change the model_id of the Bedrock instance."""
+        self.model_id = model_id
+        self.bedrock_instance = self.create_bedrock_instance(self.client)
 
     def create_bedrock_instance(self, client):
         """Create and return a Bedrock instance with the specified parameters."""

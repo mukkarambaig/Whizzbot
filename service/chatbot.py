@@ -67,6 +67,10 @@ class bot:
     def prompt_engineering(self, context: str, question: str):
         return prompt_template.format_messages(context=context, question=question)
     
+    def change_model_id(self, model_id):
+        self.model_manager.change_model(model_id)
+        self.model_chain = self.model_manager.initialize_qa_chain()
+    
     def ask_model(self, question: str):
         context = self.retrieve_context(question)
         user_message = self.prompt_engineering(context, question)

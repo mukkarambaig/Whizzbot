@@ -64,12 +64,16 @@ def streamlit_app():
     st.set_page_config(page_title="💬 Whizzbridge HR Chatbot")
 
     with st.sidebar:
-        st.title('💬 Whizzbridge HR Chatbot 13B')
+        st.title('💬 Whizzbridge HR Chatbot')
         st.write("Version 2.0")
 
         # Loading chatbot
         if "bot" not in st.session_state.keys():
             st.session_state['bot'] = bot()
+            with st.status("Loading the knowledge base and chatbot...", expanded=True) as status:
+                status.success("Knowledge base loaded successfully!", icon="🔥")
+                status.success("Chatbot loaded successfully!", icon="🔥")
+                status.success("Model: Llama2 13B", icon="🔥")
 
         # Reload the knowledge base
         st.button("Reload Knowledge Base", on_click=st.session_state['bot'].reload_db)
@@ -79,6 +83,13 @@ def streamlit_app():
 
         # Save the chat history
         st.button('Save Chat History', on_click=save_chat_history)
+        
+        if st.button('Use Llama2 13B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_ID"),)):
+            st.success("Switched to Llama2 13B!", icon="🔥")
+
+        if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),)):
+            st.success("Switched to Llama2 70B!", icon="🔥")
+
 
         # Show the documents in the knowledge base
         show_documents()
