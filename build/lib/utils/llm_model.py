@@ -6,6 +6,7 @@ from langchain.llms.bedrock import Bedrock
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain.chains.question_answering import load_qa_chain
+from langchain.memory import ConversationBufferMemory
 from icecream import ic
 class BedrockManager:
     def __init__(self):
@@ -43,8 +44,8 @@ class BedrockManager:
     
     def initialize_qa_chain(self):
         """Initialize and return a question-answering chain."""
-        return load_qa_chain(self.bedrock_instance)
+        return load_qa_chain(llm=self.bedrock_instance)
 
     def initialize_rag_chain(self, context, prompt):
         """Initialize and return a RAG chain with the specified components."""
-        return ({"context" : context,"question": RunnablePassthrough()} | prompt | self.bedrock_instance | StrOutputParser())
+        return ({"context" : context, "question": RunnablePassthrough()} | prompt | self.bedrock_instance | StrOutputParser())

@@ -13,8 +13,10 @@ class TextSplitter:
     """Utility class to split text into chunks."""
 
     def __init__(self, chunk_size: int, chunk_overlap: int, tokenizer: str):
-        self.text_splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
-            AutoTokenizer.from_pretrained(tokenizer),
+        # self.text_splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
+        #     AutoTokenizer.from_pretrained(tokenizer),
+        #     chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
     def split(self, text: str) -> List[str]:
