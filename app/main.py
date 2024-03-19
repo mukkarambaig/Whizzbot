@@ -2,6 +2,7 @@
 import os
 import time
 from datetime import datetime
+from io import StringIO
 
 # Third-party modules
 import streamlit as st
@@ -76,20 +77,21 @@ def streamlit_app():
                 status.success("Model: Llama2 13B", icon="🔥")
 
         # Reload the knowledge base
-        st.button("Reload Knowledge Base", on_click=st.session_state['bot'].reload_db)
+        st.button("Reload Knowledge Base", on_click=st.session_state['bot'].reload_db, use_container_width=True)
 
         # Clear the chat history
-        st.button('Clear Chat History', on_click=clear_chat_history)
+        st.button('Clear Chat History', on_click=clear_chat_history, use_container_width=True)
 
         # Save the chat history
-        st.button('Save Chat History', on_click=save_chat_history)
+        st.button('Save Chat History', on_click=save_chat_history, use_container_width=True)
         
-        if st.button('Use Llama2 13B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_ID"),)):
+        if st.button('Use Llama2 13B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_ID"),), use_container_width=True):
             st.success("Switched to Llama2 13B!", icon="🔥")
 
-        if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),)):
+        if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),), use_container_width=True):
             st.success("Switched to Llama2 70B!", icon="🔥")
-
+        
+        uploaded_file = st.file_uploader("Choose a file")
 
         # Show the documents in the knowledge base
         show_documents()
