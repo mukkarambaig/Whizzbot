@@ -40,6 +40,7 @@ prompt_template = ChatPromptTemplate.from_messages(
         ]
     )
 
+# TODO: Use a more enhance prompt to generate crisp and short answers!
 # Define the chatbot prompt
 # prompt_template = ChatPromptTemplate.from_messages(
 #         [
@@ -76,6 +77,7 @@ class bot:
         self.database = self.load_db()
         self.model_manager = BedrockManager()
         self.model_chain = self.model_manager.initialize_qa_chain()
+        # self.model_chain = self.model_manager.initialize_memory_conversation_chain()
     
     def split_text(self):
         text = read_unstructured_data(DOCUMENT_DIR)
@@ -109,6 +111,7 @@ class bot:
         print("===============Prompt Engineered===============")
         print(user_message)
         print("===============Prompt Engineered===============")
-        response = self.model_chain.invoke({"input_documents": context, "question": user_message})
+        # response = self.model_chain.invoke({"input_documents": context, "question": user_message})
+        response = self.model_chain.invoke({"input": context, "question": user_message})
         return response['output_text']
         # return "Ruko zara sabr kro!"
