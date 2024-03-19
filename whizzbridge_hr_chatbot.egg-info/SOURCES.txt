@@ -1,6 +1,7 @@
 README.md
 setup.py
 service/__init__.py
+service/chatbot.py
 utils/__init__.py
 utils/data_preprocessing.py
 utils/document_loader.py

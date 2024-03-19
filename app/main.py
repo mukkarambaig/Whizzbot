@@ -70,7 +70,7 @@ def streamlit_app():
         st.header("", divider="blue")
         #TODO: Add a file uploader to add documents to the knowledge base
         uploaded_files = st.file_uploader("Choose a file", accept_multiple_files=True)
-        if uploaded_files is not None:
+        if uploaded_files:  # This will check if the list is not empty
             for uploaded_file in uploaded_files:
                 with open(os.path.join(DOCUMENT_DIR, uploaded_file.name), "wb") as f:
                     f.write(uploaded_file.getbuffer())
