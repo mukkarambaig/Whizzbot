@@ -6,6 +6,7 @@ utils/__init__.py
 utils/data_preprocessing.py
 utils/document_loader.py
 utils/llm_model.py
+utils/prompt_generator.py
 whizzbridge_hr_chatbot.egg-info/PKG-INFO
 whizzbridge_hr_chatbot.egg-info/SOURCES.txt
 whizzbridge_hr_chatbot.egg-info/dependency_links.txt

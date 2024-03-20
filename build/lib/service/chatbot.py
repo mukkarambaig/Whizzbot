@@ -11,6 +11,7 @@ from langchain.prompts import ChatPromptTemplate
 from utils.data_preprocessing import TextSplitter, VectorStoreManager
 from utils.document_loader import read_unstructured_data
 from utils.llm_model import BedrockManager
+from utils.prompt_generator import prompt_generator
 
 load_dotenv()
 DOCUMENT_DIR = os.getenv("DOCUMENT_DIR")
@@ -100,18 +101,40 @@ class bot:
         self.model_manager.change_model(model_id)
         self.model_chain = self.model_manager.initialize_qa_chain()
     
+    def extract_context(self, question: str):
+        docs = self.retrieve_context(question)
+        formatted_text = ""
+        for idx, doc in enumerate(docs, start=1):
+            # Assuming each doc is an object with a page_content attribute
+            content = doc.page_content if hasattr(doc, 'page_content') else "No content available"
+            print(f"context {idx}: {content}\n---\n")
+            formatted_text += f"context {idx}: {content}\n---\n"
+        return formatted_text.strip("---\n")
+
+
     def ask_model(self, question: str):
-        context = self.retrieve_context(question)
-        print("===============Retrieved Context===============")
-        for i in context:
-            print(i, end="\n--------------\n")
-        print("===============Retrieved Context===============")
-        print("\n\n\n")
-        user_message = self.prompt_engineering(context, question)
-        print("===============Prompt Engineered===============")
-        print(user_message)
-        print("===============Prompt Engineered===============")
+        # context = self.retrieve_context(question)
+        # print("===============Retrieved Context===============")
+        # for i in context:
+        #     print(i, end="\n--------------\n")
+        # print("===============Retrieved Context===============")
+        # print("\n\n\n")
+        # user_message = self.prompt_engineering(context, question)
+        # print("===============Prompt Engineered===============")
+        # print(user_message)
+        # print("===============Prompt Engineered===============")
         # response = self.model_chain.invoke({"input_documents": context, "question": user_message})
-        response = self.model_chain.invoke({"input_documents": context, "question": user_message})
+        # response = self.model_chain.invoke({"input_documents": context, "question": user_message})
+        # return response['output_text']
+        context = self.extract_context(question)
+        print("===============Extracted Context===============")
+        print(context)
+        print("===============Extracted Context===============")
+        prompt = prompt_generator(question, context)
+        print("===============Prompt Engineered===============")
+        print(prompt)
+        print("===============Prompt Engineered===============")
+        # TODO: Eliminate the docs variable and use the context variable
+        docs = self.retrieve_context(question)
+        response = self.model_chain.invoke({"input_documents": docs, "question": prompt})
         return response['output_text']
-        # return "Ruko zara sabr kro!"

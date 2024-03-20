@@ -92,7 +92,7 @@ examples = [
     },
 ]
 
-def prompt_generator():
+def prompt_generator(prompt: str, context: str,) -> str:
     prompt_template = PromptTemplate(
     input_variables=["input", "context", "output"],
     template="input: {input}\n\ncontext: {context}\n\noutput: {output}"
@@ -119,4 +119,10 @@ def prompt_generator():
     input_variables=["input", "context"],
     )
     
-    return dynamic_prompt
+    return dynamic_prompt.format(input=prompt, context=context)
+
+def main():
+    pass
+
+if __name__ == "__main__":
+    main()

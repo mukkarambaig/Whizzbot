@@ -66,7 +66,7 @@ def streamlit_app():
 
     with st.sidebar:
         st.title('💬 Whizzbridge HR Chatbot')
-        st.write("Version 2.0")
+        st.write("Version 3.0")
         st.header("", divider="blue")
         #TODO: Add a file uploader to add documents to the knowledge base
         uploaded_files = st.file_uploader("Choose a file", accept_multiple_files=True)
