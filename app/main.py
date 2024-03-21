@@ -66,17 +66,8 @@ def streamlit_app():
 
     with st.sidebar:
         st.title('💬 Whizzbridge HR Chatbot')
-        st.write("Version 3.0")
-        st.header("", divider="blue")
-        #TODO: Add a file uploader to add documents to the knowledge base
-        uploaded_files = st.file_uploader("Choose a file", accept_multiple_files=True)
-        if uploaded_files:  # This will check if the list is not empty
-            for uploaded_file in uploaded_files:
-                with open(os.path.join(DOCUMENT_DIR, uploaded_file.name), "wb") as f:
-                    f.write(uploaded_file.getbuffer())
-            st.warning('New document found! Knowledge reload required', icon="⚠️")
-        st.header("", divider="blue")
-
+        st.write("Version 4.0")
+        
         # Loading chatbot
         if "bot" not in st.session_state.keys():
             st.session_state['bot'] = bot()
@@ -84,15 +75,24 @@ def streamlit_app():
                 status.success("Knowledge base loaded successfully!", icon="🔥")
                 status.success("Chatbot loaded successfully!", icon="🔥")
                 status.success("Model: Llama2 13B", icon="🔥")
+        
+        # upload documents
+        st.header("", divider="blue")
+        uploaded_files = st.file_uploader("Choose a file", accept_multiple_files=True)
+        if uploaded_files:  # This will check if the list is not empty
+            for uploaded_file in uploaded_files:
+                with open(os.path.join(DOCUMENT_DIR, uploaded_file.name), "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+            st.warning('New document found! Knowledge reload required', icon="👇")
+        # Reload the knowledge base
+        st.button("Reload Knowledge Base", on_click=st.session_state['bot'].reload_db, use_container_width=True)
+        st.header("", divider="blue")
 
         if st.button('Use Llama2 13B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_ID"),), use_container_width=True):
             st.success("Switched to Llama2 13B!", icon="🔥")
 
         if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),), use_container_width=True):
             st.success("Switched to Llama2 70B!", icon="🔥")
-
-        # Reload the knowledge base
-        st.button("Reload Knowledge Base", on_click=st.session_state['bot'].reload_db, use_container_width=True)
 
         # Clear the chat history
         st.button('Clear Chat History', on_click=clear_chat_history, use_container_width=True)

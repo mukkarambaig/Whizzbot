@@ -77,6 +77,8 @@ class bot:
         self.vectorstore_manager: VectorStoreManager = VectorStoreManager(EMBEDDING_MODEL)
         self.database = self.load_db()
         self.model_manager = BedrockManager()
+        # self.model_chain = self.model_manager.initialize_llm_chain()
+        # self.model_chain = self.model_manager.initialize_memory_conversation_chain()
         self.model_chain = self.model_manager.initialize_qa_chain()
         # self.model_chain = self.model_manager.initialize_memory_conversation_chain()
     
@@ -112,20 +114,9 @@ class bot:
         return formatted_text.strip("---\n")
 
 
+        # TODO: Eliminate the docs variable and use the context variable
+        # TODO: Add memory to the model chain
     def ask_model(self, question: str):
-        # context = self.retrieve_context(question)
-        # print("===============Retrieved Context===============")
-        # for i in context:
-        #     print(i, end="\n--------------\n")
-        # print("===============Retrieved Context===============")
-        # print("\n\n\n")
-        # user_message = self.prompt_engineering(context, question)
-        # print("===============Prompt Engineered===============")
-        # print(user_message)
-        # print("===============Prompt Engineered===============")
-        # response = self.model_chain.invoke({"input_documents": context, "question": user_message})
-        # response = self.model_chain.invoke({"input_documents": context, "question": user_message})
-        # return response['output_text']
         context = self.extract_context(question)
         print("===============Extracted Context===============")
         print(context)
@@ -134,8 +125,7 @@ class bot:
         print("===============Prompt Engineered===============")
         print(prompt)
         print("===============Prompt Engineered===============")
-        # TODO: Eliminate the docs variable and use the context variable
-        # TODO: Add memory to the model chain
+        
         docs = self.retrieve_context(question)
         response = self.model_chain.invoke({"input_documents": docs, "question": prompt})
-        return response['output_text']
+        return response["output_text"]

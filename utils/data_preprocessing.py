@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 
 
@@ -13,15 +14,16 @@ class TextSplitter:
     """Utility class to split text into chunks."""
 
     def __init__(self, chunk_size: int, chunk_overlap: int, tokenizer: str):
-        # self.text_splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
-        #     AutoTokenizer.from_pretrained(tokenizer),
-        #     chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        # self.text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+        #     encoding="cl100k_base",
+        #     chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
     def split(self, text: str) -> List[str]:
         """Split the text into chunks."""
         return self.text_splitter.create_documents([text])
+        # return self.text_splitter.create_documents(text)
 
 
 class VectorStoreManager:
@@ -51,6 +53,7 @@ class VectorStoreManager:
     def get_relevant_documents(self, vectorstore, query: str):
         """Return the most relevant documents for a given query."""
         return vectorstore.similarity_search(query, k=3)
+        # return vectorstore.similarity_search_with_score(query, k=3)
 
 
 def main():
