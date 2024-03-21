@@ -135,6 +135,7 @@ class bot:
         print(prompt)
         print("===============Prompt Engineered===============")
         # TODO: Eliminate the docs variable and use the context variable
+        # TODO: Add memory to the model chain
         docs = self.retrieve_context(question)
         response = self.model_chain.invoke({"input_documents": docs, "question": prompt})
         return response['output_text']
