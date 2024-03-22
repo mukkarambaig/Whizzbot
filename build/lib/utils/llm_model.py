@@ -59,6 +59,6 @@ class BedrockManager:
         return LLMChain(llm=self.bedrock_instance, memory=ConversationBufferMemory(llm=self.bedrock_instance, max_token_limit=200),
                                  verbose=True)
 
-    def initialize_rag_chain(self, context, prompt):
+    def initialize_rag_chain(self):
         """Initialize and return a RAG chain with the specified components."""
-        return ({"context" : context, "question": RunnablePassthrough()} | prompt | self.bedrock_instance | StrOutputParser())
+        return (self.bedrock_instance | StrOutputParser())

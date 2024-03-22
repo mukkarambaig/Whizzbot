@@ -79,8 +79,8 @@ class bot:
         self.model_manager = BedrockManager()
         # self.model_chain = self.model_manager.initialize_llm_chain()
         # self.model_chain = self.model_manager.initialize_memory_conversation_chain()
-        self.model_chain = self.model_manager.initialize_qa_chain()
-        # self.model_chain = self.model_manager.initialize_memory_conversation_chain()
+        # self.model_chain = self.model_manager.initialize_qa_chain()
+        self.model_chain = self.model_manager.initialize_rag_chain()
     
     def split_text(self):
         text = read_unstructured_data(DOCUMENT_DIR)
@@ -103,29 +103,44 @@ class bot:
         self.model_manager.change_model(model_id)
         self.model_chain = self.model_manager.initialize_qa_chain()
     
-    def extract_context(self, question: str):
+    def extract_context(self, question):
         docs = self.retrieve_context(question)
+        print("===============Extracted Context===============")
+        print(docs)
+        print("===============Extracted Context===============")
+        SCORE = 0.9
+        # Check if all documents have a score greater than 0.5
+        if all(score > SCORE for _, score in docs):
+            print("No relevant document found")
+            return "No relevant document found"
+
         formatted_text = ""
-        for idx, doc in enumerate(docs, start=1):
-            # Assuming each doc is an object with a page_content attribute
-            content = doc.page_content if hasattr(doc, 'page_content') else "No content available"
-            print(f"context {idx}: {content}\n---\n")
-            formatted_text += f"context {idx}: {content}\n---\n"
-        return formatted_text.strip("---\n")
+        for idx, (doc, score) in enumerate(docs, start=1):
+            if score <= SCORE:
+                # Access the page_content of the Document object only if the score is 0.5 or less
+                content = doc.page_content if hasattr(doc, 'page_content') else "No content available"
+                print(f"context {idx}: {content}\nScore: {score}\n---\n")
+                formatted_text += f"context {idx}: {content}\nScore: {score}\n---\n"
+        print("===============Formatted Context===============")
+        print(formatted_text)
+        print("===============Formatted Context===============")
+        
+        # If no content was added to formatted_text, return a message indicating no relevant documents were found.
+        return formatted_text.rstrip("---\n") if formatted_text else "No relevant document found"
+
 
 
         # TODO: Eliminate the docs variable and use the context variable
         # TODO: Add memory to the model chain
     def ask_model(self, question: str):
         context = self.extract_context(question)
-        print("===============Extracted Context===============")
+        print("===============Context to be passed===============")
         print(context)
-        print("===============Extracted Context===============")
+        print("===============Extracted to be passed===============")
         prompt = prompt_generator(question, context)
         print("===============Prompt Engineered===============")
         print(prompt)
         print("===============Prompt Engineered===============")
-        
-        docs = self.retrieve_context(question)
-        response = self.model_chain.invoke({"input_documents": docs, "question": prompt})
-        return response["output_text"]
+        response = self.model_chain.invoke(prompt)
+        return response
+        # return "Tu therna k nae?"

@@ -52,8 +52,13 @@ class VectorStoreManager:
     
     def get_relevant_documents(self, vectorstore, query: str):
         """Return the most relevant documents for a given query."""
-        return vectorstore.similarity_search(query, k=3)
-        # return vectorstore.similarity_search_with_score(query, k=3)
+        # return vectorstore.similarity_search(query, k=3)
+        temp = vectorstore.similarity_search_with_score(query)
+        print(f"*** Length of temp: {len(temp)} ***")
+        print("!!!!!!!!!!!!!!!!! Printing temp !!!!!!!!!!!!!!!!!")
+        print(temp)
+        print("!!!!!!!!!!!!!!!!! Printing temp !!!!!!!!!!!!!!!!!")
+        return temp
 
 
 def main():

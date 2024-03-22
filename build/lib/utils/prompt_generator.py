@@ -110,7 +110,7 @@ def prompt_generator(prompt: str, context: str,) -> str:
     prefix="""You are an advanced AI assistant designed to function as an HR manager, with complete knowledge of a specific provided document. Your task is to provide clear and understandable answers to queries based on this document's content. Adhere to these guidelines when responding:
 
          - Rely STRICTLY solely on the information from the provided document to answer questions. If the document does not contain the necessary information, apologize and clarify that the relevant context is missing.
-         - Keep your answers concise, using no more than FIVE sentences ONLY!
+         - Keep your answers concise, using no more than five sentence only!
          - Format your answers in BULLET POINTS to ensure they are easy to read and understand, even for non-English speakers.
          
          Use the following examples to guide your responses:
