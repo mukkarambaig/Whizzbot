@@ -69,6 +69,11 @@ prompt_template = ChatPromptTemplate.from_messages(
 #         ]
 #     )
 
+def display(string: str) -> None:
+            # Print the generated prompt for debugging or logging purposes
+        print("===============DEBUGGING===============")
+        print(string)
+        print("===============DEBUGGING===============")
 
 class bot:
     def __init__(self):
@@ -83,64 +88,54 @@ class bot:
         self.model_chain = self.model_manager.initialize_rag_chain()
     
     def split_text(self):
+        """Split the unstructured text data into chunks for processing."""
         text = read_unstructured_data(DOCUMENT_DIR)
         return self.text_splitter.split(text)
     
     def load_db(self):
+        """Load the vectorstore from the disk."""
         return self.vectorstore_manager.load_vectorstore(EMBEDDINGS_DIR)
     
     def reload_db(self):
+        """Reload the vectorstore from the disk."""
         self.database = self.vectorstore_manager.create_vectorstore(self.split_text())
         self.vectorstore_manager.save_vectorstore(self.database, EMBEDDINGS_DIR)
     
     def retrieve_context(self, question: str):
+        """Retrieve relevant documents based on the user's question."""
         return self.vectorstore_manager.get_relevant_documents(self.database, question)
     
     def prompt_engineering(self, context: str, question: str):
+        """Generate a prompt for the chatbot based on the context and question."""
         return prompt_template.format_messages(context=context, question=question)
     
     def change_model_id(self, model_id):
+        """Change the model_id of the Bedrock instance."""
         self.model_manager.change_model(model_id)
         self.model_chain = self.model_manager.initialize_qa_chain()
     
     def extract_context(self, question):
+        """Extract the context from the relevant documents based on the user's question."""
         docs = self.retrieve_context(question)
-        print("===============Extracted Context===============")
-        print(docs)
-        print("===============Extracted Context===============")
         SCORE = 0.9
-        # Check if all documents have a score greater than 0.5
-        if all(score > SCORE for _, score in docs):
-            print("No relevant document found")
-            return "No relevant document found"
-
-        formatted_text = ""
-        for idx, (doc, score) in enumerate(docs, start=1):
-            if score <= SCORE:
-                # Access the page_content of the Document object only if the score is 0.5 or less
-                content = doc.page_content if hasattr(doc, 'page_content') else "No content available"
-                print(f"context {idx}: {content}\nScore: {score}\n---\n")
-                formatted_text += f"context {idx}: {content}\nScore: {score}\n---\n"
-        print("===============Formatted Context===============")
-        print(formatted_text)
-        print("===============Formatted Context===============")
         
-        # If no content was added to formatted_text, return a message indicating no relevant documents were found.
-        return formatted_text.rstrip("---\n") if formatted_text else "No relevant document found"
+        formatted_texts = [
+            f"context {idx}: {doc.page_content if hasattr(doc, 'page_content') else 'No content available'}\nScore: {score}\n---\n"
+            for idx, (doc, score) in enumerate(docs, start=1) if score <= SCORE
+        ]
 
+        return "\n".join(formatted_texts).rstrip("---\n") if formatted_texts else "No relevant document found"
 
-
-        # TODO: Eliminate the docs variable and use the context variable
-        # TODO: Add memory to the model chain
+    # TODO: Add memory to the model chain
+    # TODO: Fix the prompt formatting -> prompt_generation.py
     def ask_model(self, question: str):
+        """Ask the model a question and return its response."""
+        # Extract context based on the question
         context = self.extract_context(question)
-        print("===============Context to be passed===============")
-        print(context)
-        print("===============Extracted to be passed===============")
+        # Generate a prompt using the extracted context and the question
         prompt = prompt_generator(question, context)
-        print("===============Prompt Engineered===============")
-        print(prompt)
-        print("===============Prompt Engineered===============")
-        response = self.model_chain.invoke(prompt)
+        display(prompt)        
+        
+        # Invoke the model chain with the generated prompt and return its response
+        response = self.model_chain.invoke(prompt)    
         return response
-        # return "Tu therna k nae?"

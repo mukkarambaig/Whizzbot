@@ -1,5 +1,16 @@
 from langchain.prompts import FewShotPromptTemplate, PromptTemplate
 from langchain.prompts.example_selector import LengthBasedExampleSelector
+# FIXME: The prompt answering design has flaws. Eg: the model answers in the following way:
+# context 1:
+
+# Use RFID card to record time-out and mark day end.
+# Use RFID card to open doors within office premises.
+# Thumb impression can be used for attendance in case of forgetting RFID card.
+# context 2:
+
+# All employees at Head Office must have an RFID card.
+# RFID card contains necessary employee details for attendance and identification.
+# Employees must have their RFID card to access office premises.
 
 examples = [
     {
