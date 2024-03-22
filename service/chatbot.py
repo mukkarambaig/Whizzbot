@@ -120,7 +120,7 @@ class bot:
         SCORE = 0.9
         
         formatted_texts = [
-            f"context {idx}: {doc.page_content if hasattr(doc, 'page_content') else 'No content available'}\nScore: {score}\n---\n"
+            f" {doc.page_content if hasattr(doc, 'page_content') else 'No content available'}\nScore: {score}\n---\n"
             for idx, (doc, score) in enumerate(docs, start=1) if score <= SCORE
         ]
 
