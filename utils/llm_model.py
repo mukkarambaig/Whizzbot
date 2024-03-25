@@ -1,9 +1,17 @@
+# Build-in modules
 import os
+
+# Third-party modules
 from dotenv import load_dotenv
 import boto3
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.bedrock import Bedrock
 from langchain_core.output_parsers import StrOutputParser
+from langchain.chains import LLMChain, ConstitutionalChain
+from langchain.chains.constitutional_ai.models import ConstitutionalPrinciple
+
+# Custom modules
+from utils.prompt_generator import prompt_template_generator
 
 class BedrockManager:
     def __init__(self):
@@ -42,3 +50,19 @@ class BedrockManager:
     def initialize_rag_chain(self):
         """Initialize and return a RAG chain with the specified components."""
         return (self.bedrock_instance | StrOutputParser())
+    
+    def initialize_llm_chain(self):
+        """Initialize and return a LLM chain with the specified components."""
+        return LLMChain(llm=self.bedrock_instance, prompt=prompt_template_generator())
+    
+    # TODO: The llm argument require LLMChain instance
+    def constitutional_chain(self):
+        """Return a constitutional chain with the specified components."""
+        principles = ConstitutionalChain.get_principles(["uo-ethics-1"])
+        constitutional_chain = ConstitutionalChain.from_llm(
+            llm = self.bedrock_instance,
+            chain = self.initialize_llm_chain(),
+            constitutional_principles = principles,
+            verbose = True,
+        )
+        return constitutional_chain

@@ -82,10 +82,8 @@ class bot:
         self.vectorstore_manager: VectorStoreManager = VectorStoreManager(EMBEDDING_MODEL)
         self.database = self.load_db()
         self.model_manager = BedrockManager()
-        # self.model_chain = self.model_manager.initialize_llm_chain()
-        # self.model_chain = self.model_manager.initialize_memory_conversation_chain()
-        # self.model_chain = self.model_manager.initialize_qa_chain()
-        self.model_chain = self.model_manager.initialize_rag_chain()
+        self.model_chain = self.model_manager.constitutional_chain()
+        # self.model_chain = self.model_manager.initialize_rag_chain()
     
     def split_text(self):
         """Split the unstructured text data into chunks for processing."""
@@ -127,15 +125,27 @@ class bot:
         return "\n".join(formatted_texts).rstrip("---\n") if formatted_texts else "No relevant document found"
 
     # TODO: Add memory to the model chain
-    # TODO: Fix the prompt formatting -> prompt_generation.py
+    # TODO: Security and privacy to prompt
+    # def ask_model(self, question: str):
+    #     """Ask the model a question and return its response."""
+    #     # Extract context based on the question
+    #     context = self.extract_context(question)
+    #     # Generate a prompt using the extracted context and the question
+    #     prompt = prompt_generator(question, context)
+    #     display(prompt)        
+        
+    #     # Invoke the model chain with the generated prompt and return its response
+    #     response = self.model_chain.invoke(prompt)    
+    #     return response
+    
     def ask_model(self, question: str):
         """Ask the model a question and return its response."""
         # Extract context based on the question
         context = self.extract_context(question)
         # Generate a prompt using the extracted context and the question
-        prompt = prompt_generator(question, context)
-        display(prompt)        
+        # prompt = self.prompt_engineering(context, question)
+        # display(prompt)        
         
         # Invoke the model chain with the generated prompt and return its response
-        response = self.model_chain.invoke(prompt)    
+        response = self.model_chain.run(input=question, context=context)    
         return response

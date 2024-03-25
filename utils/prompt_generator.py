@@ -1,16 +1,5 @@
 from langchain.prompts import FewShotPromptTemplate, PromptTemplate
 from langchain.prompts.example_selector import LengthBasedExampleSelector
-# FIXME: The prompt answering design has flaws. Eg: the model answers in the following way:
-# context 1:
-
-# Use RFID card to record time-out and mark day end.
-# Use RFID card to open doors within office premises.
-# Thumb impression can be used for attendance in case of forgetting RFID card.
-# context 2:
-
-# All employees at Head Office must have an RFID card.
-# RFID card contains necessary employee details for attendance and identification.
-# Employees must have their RFID card to access office premises.
 
 examples = [{
     "input":
@@ -100,6 +89,35 @@ def prompt_generator(
     )
 
     return dynamic_prompt.format(input=prompt, context=context)
+
+def prompt_template_generator() -> str:
+    prompt_template = PromptTemplate(
+        input_variables=["input", "context", "output"],
+        template="input: {input}\n\ncontext: {context}\n\noutput: {output}"
+    )
+
+    example_selector = LengthBasedExampleSelector(
+        examples=examples, example_prompt=prompt_template, max_length=2000
+    )
+
+    dynamic_prompt = FewShotPromptTemplate(
+        example_selector=example_selector,
+        example_prompt=prompt_template,
+        prefix=
+        """You are an advanced AI assistant designed to function as an HR manager, with complete knowledge of a specific provided document. Your task is to provide clear and understandable answers to queries based on this document's content. Adhere to these guidelines when responding:
+
+        - Rely STRICTLY solely on the information from the provided document to answer questions. If the document does not contain the necessary information, apologize and clarify that the relevant context is missing.
+        - Keep your answers concise, using no more than TEN sentences!
+        - Format your answers in BULLET POINTS to ensure they are easy to read and understand, even for non-English speakers.
+        
+        Use the following examples to guide your responses:
+        """,
+        suffix="input: {input}\n\ncontext: {context}\n\noutput:",
+        input_variables=["input", "context"],
+    )
+
+    return dynamic_prompt
+
 
 
 def main():
