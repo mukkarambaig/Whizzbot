@@ -147,5 +147,5 @@ class bot:
         # display(prompt)        
         
         # Invoke the model chain with the generated prompt and return its response
-        response = self.model_chain.invoke(input=question, context=context)    
+        response = self.model_chain.run(input=question, context=context)    
         return response
