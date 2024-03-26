@@ -90,6 +90,7 @@ def prompt_generator(
 
     return dynamic_prompt.format(input=prompt, context=context)
 
+# NOTE: The following code is only for LLMChain initialization
 def prompt_template_generator() -> str:
     prompt_template = PromptTemplate(
         input_variables=["input", "context", "output"],
@@ -113,7 +114,7 @@ def prompt_template_generator() -> str:
         Use the following examples to guide your responses:
         """,
         suffix="input: {input}\n\ncontext: {context}\n\noutput:",
-        input_variables=["input", "context"],
+        input_variables=["human_input", "context"],
     )
 
     return dynamic_prompt

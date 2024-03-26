@@ -34,7 +34,7 @@ def save_chat_history():
 
     # Generate a human-readable and timestamped filename
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    filename = f'chats/chat_history_{timestamp}.txt'
+    filename = f'data/chats/{timestamp}.txt'
 
     # Write the chat history to the file
     with open(filename, 'w') as file:

@@ -9,6 +9,8 @@ from langchain.llms.bedrock import Bedrock
 from langchain_core.output_parsers import StrOutputParser
 from langchain.chains import LLMChain, ConstitutionalChain
 from langchain.chains.constitutional_ai.models import ConstitutionalPrinciple
+from langchain.memory import ConversationSummaryBufferMemory
+from langchain.chains import ConversationChain
 
 # Custom modules
 from utils.prompt_generator import prompt_template_generator
@@ -51,11 +53,22 @@ class BedrockManager:
         """Initialize and return a RAG chain with the specified components."""
         return (self.bedrock_instance | StrOutputParser())
     
+    # FIXME: require answer formatting!
+    def initialize_conversation_memory_chain(self):
+        """Initialize and return a conversation memory chain with the specified components."""
+        return ConversationChain(
+                                 llm=self.bedrock_instance,
+                                 memory=ConversationSummaryBufferMemory(llm=self.bedrock_instance, max_token_limit=150),
+                                 verbose=True
+                                )
+    
+    # FIXME: require answer formatting! (Works in hand with constitutional chain)
     def initialize_llm_chain(self):
         """Initialize and return a LLM chain with the specified components."""
-        return LLMChain(llm=self.bedrock_instance, prompt=prompt_template_generator())
+        return LLMChain(llm=self.bedrock_instance, prompt=prompt_template_generator(),
+                        memory=ConversationSummaryBufferMemory(llm=self.bedrock_instance, max_token_limit=150), verbose=True)
     
-    # TODO: The llm argument require LLMChain instance
+    # FIXME: require answer formatting!
     def constitutional_chain(self):
         """Return a constitutional chain with the specified components."""
         principles = ConstitutionalChain.get_principles(["uo-ethics-1"])
@@ -65,4 +78,4 @@ class BedrockManager:
             constitutional_principles = principles,
             verbose = True,
         )
-        return constitutional_chain
+        return constitutional_chain 
