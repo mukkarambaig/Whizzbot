@@ -66,7 +66,7 @@ class bot:
     
     def update_conversation_memory(self, user_input, model_response):
         """Update the conversation memory with the latest conversation turn, keeping only the last 5 turns."""
-        if len(self.bot_conversation_memory) >= 5:
+        if len(self.bot_conversation_memory) >= 3:
             # Remove the oldest conversation turn
             self.bot_conversation_memory.pop(0)
         # Add the new conversation turn
