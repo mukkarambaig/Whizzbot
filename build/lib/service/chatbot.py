@@ -5,13 +5,13 @@ from typing import List
 # Third-party modules
 from dotenv import load_dotenv
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
-from langchain.prompts import ChatPromptTemplate
 
 # Custom modules
 from utils.data_preprocessing import TextSplitter, VectorStoreManager
 from utils.document_loader import read_unstructured_data
 from utils.llm_model import BedrockManager
 from utils.prompt_generator import prompt_generator
+
 
 load_dotenv()
 DOCUMENT_DIR = os.getenv("DOCUMENT_DIR")
@@ -38,9 +38,8 @@ class bot:
         self.vectorstore_manager: VectorStoreManager = VectorStoreManager(EMBEDDING_MODEL)
         self.database = self.load_db()
         self.model_manager = BedrockManager()
-        # self.model_chain = self.model_manager.constitutional_chain()
         self.model_chain = self.model_manager.initialize_rag_chain()
-        # self.model_chain = self.model_manager.initialize_conversation_memory_chain()
+        self.bot_conversation_memory = []
     
     def split_text(self):
         """Split the unstructured text data into chunks for processing."""
@@ -65,6 +64,27 @@ class bot:
         self.model_manager.change_model(model_id)
         self.model_chain = self.model_manager.initialize_rag_chain()
     
+    def update_conversation_memory(self, user_input, model_response):
+        """Update the conversation memory with the latest conversation turn, keeping only the last 5 turns."""
+        if len(self.bot_conversation_memory) >= 5:
+            # Remove the oldest conversation turn
+            self.bot_conversation_memory.pop(0)
+        # Add the new conversation turn
+        self.bot_conversation_memory.append({'user': user_input, 'assistant': model_response})
+    
+    def extract_conversation_history(self):
+        """Extract the conversation history from the bot's memory."""
+        if not self.bot_conversation_memory:
+            return "No conversation has taken place yet."
+        
+        history = []
+        for conversation in self.bot_conversation_memory:
+            user_line = f"user: {conversation['user']}"
+            ai_line = f"AI: {conversation['assistant']}"
+            history.append(f"{user_line}\n{ai_line}")
+        return "\n".join(history)
+
+    
     def extract_context(self, question):
         """Extract the context from the relevant documents based on the user's question."""
         docs = self.retrieve_context(question)
@@ -77,43 +97,26 @@ class bot:
 
         return "\n".join(formatted_texts).rstrip("---\n") if formatted_texts else "No relevant document found"
 
-    # RAG Chain
+    # LECL Chain
     # TODO: Add memory to the model chain
     def ask_model(self, question: str):
         """Ask the model a question and return its response."""
         # Extract context based on the question
         context = self.extract_context(question)
-        # Generate a prompt using the extracted context and the question
-        prompt = prompt_generator(question, context)
-        display(prompt)        
         
-        # Invoke the model chain with the generated prompt and return its response
-        response = self.model_chain.invoke(prompt)    
+        # Extract conversation history
+        conversation_history = self.extract_conversation_history()
+        
+        # Generate a prompt using the extracted context, the question, and the conversation history
+        prompt = prompt_generator(conversation_history, question, context)
+        display(prompt)
+        
+        # For demonstration purposes, let's assume this is the response generation step
+        response = self.model_chain.invoke(prompt)
+        # response = "Testing response"  # Simulated response for demonstration
+        
+        # Update the conversation memory with the current interaction
+        self.update_conversation_memory(question, response)
+        
+        # Now the updated conversation memory will be used in the next interaction
         return response
-    
-    # FIXME: The output text is not formatted correctly
-    # Conversation Memory Chain
-    # def ask_model(self, question: str):
-    #     """Ask the model a question and return its response."""
-    #     # Extract context based on the question
-    #     context = self.extract_context(question)
-    #     # Generate a prompt using the extracted context and the question
-    #     prompt = prompt_generator(question, context)
-    #     display(prompt)        
-        
-    #     # Invoke the model chain with the generated prompt and return its response
-    #     response = self.model_chain.predict(input=prompt)    
-    #     return response
-    
-    # FIXME: The output text is not formatted correctly
-    # def ask_model(self, question: str):
-    #     """Ask the model a question and return its response."""
-    #     # Extract context based on the question
-    #     context = self.extract_context(question)
-    #     # Generate a prompt using the extracted context and the question
-    #     # prompt = self.prompt_engineering(context, question)
-    #     # display(prompt)        
-        
-    #     # Invoke the model chain with the generated prompt and return its response
-    #     response = self.model_chain.run(input=question, context=context)    
-    #     return response

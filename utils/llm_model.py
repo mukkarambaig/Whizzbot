@@ -1,5 +1,6 @@
 # Build-in modules
 import os
+from operator import itemgetter
 
 # Third-party modules
 from dotenv import load_dotenv
@@ -9,8 +10,14 @@ from langchain.llms.bedrock import Bedrock
 from langchain_core.output_parsers import StrOutputParser
 from langchain.chains import LLMChain, ConstitutionalChain
 from langchain.chains.constitutional_ai.models import ConstitutionalPrinciple
-from langchain.memory import ConversationSummaryBufferMemory
+from langchain.memory import ConversationSummaryBufferMemory, ConversationBufferMemory
 from langchain.chains import ConversationChain
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 
 # Custom modules
 from utils.prompt_generator import prompt_template_generator
@@ -65,8 +72,7 @@ class BedrockManager:
     # FIXME: require answer formatting! (Works in hand with constitutional chain)
     def initialize_llm_chain(self):
         """Initialize and return a LLM chain with the specified components."""
-        return LLMChain(llm=self.bedrock_instance, prompt=prompt_template_generator(),
-                        memory=ConversationSummaryBufferMemory(llm=self.bedrock_instance, max_token_limit=150), verbose=True)
+        return LLMChain(llm=self.bedrock_instance, prompt=prompt_template_generator(), verbose=True)
     
     # FIXME: require answer formatting!
     def constitutional_chain(self):

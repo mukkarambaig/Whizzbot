@@ -62,6 +62,7 @@ examples = [{
 
 
 def prompt_generator(
+    conv: str,
     prompt: str,
     context: str,
 ) -> str:
@@ -79,16 +80,17 @@ def prompt_generator(
         """You are an advanced AI assistant designed to function as an HR manager, with complete knowledge of a specific provided document. Your task is to provide clear and understandable answers to queries based on this document's content. Adhere to these guidelines when responding:
 
          - Rely STRICTLY solely on the information from the provided document to answer questions. If the document does not contain the necessary information, apologize and clarify that the relevant context is missing.
+         - If context is NOT found. Use the CONVERSATION HISTORY to answer the question if APPLICABLE.
          - Keep your answers concise, using no more than TEN sentence!
          - Format your answers in BULLET POINTS to ensure they are easy to read and understand, even for non-English speakers.
          
          Use the following examples to guide your responses:
          """,
-        suffix="input: {input}\n\ncontext: {context}\n\noutput:",
-        input_variables=["input", "context"],
+        suffix="conversation history: \n{conversation}\n\nuser wants know about: {input}\n\ncontext: {context}\n\noutput:",
+        input_variables=["conversation" ,"input", "context"],
     )
 
-    return dynamic_prompt.format(input=prompt, context=context)
+    return dynamic_prompt.format(conversation=conv, input=prompt, context=context)
 
 # NOTE: The following code is only for LLMChain initialization
 def prompt_template_generator() -> str:
@@ -114,7 +116,7 @@ def prompt_template_generator() -> str:
         Use the following examples to guide your responses:
         """,
         suffix="input: {input}\n\ncontext: {context}\n\noutput:",
-        input_variables=["human_input", "context"],
+        input_variables=["input", "context"],
     )
 
     return dynamic_prompt
@@ -122,7 +124,11 @@ def prompt_template_generator() -> str:
 
 
 def main():
-    pass
+    from icecream import ic
+    prompt = "What are the guidelines for overtime pay?"
+    context = "The document states that employees are eligible for overtime pay at a rate of 1.5 times their regular hourly rate for hours worked beyond 40 in a week."
+    conv = "How may I assist you today?"
+    ic(prompt_generator(conv, prompt, context))
 
 
 if __name__ == "__main__":
