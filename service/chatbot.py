@@ -83,6 +83,10 @@ class bot:
             ai_line = f"AI: {conversation['assistant']}"
             history.append(f"{user_line}\n{ai_line}")
         return "\n".join(history)
+    
+    def clear_conversation_history(self):
+        """Clear the bot's conversation memory."""
+        self.bot_conversation_memory = []
 
     
     def extract_context(self, question):

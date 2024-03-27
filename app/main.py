@@ -95,7 +95,7 @@ def streamlit_app():
             st.success("Switched to Llama2 70B!", icon="🔥")
 
         # Clear the chat history
-        st.button('Clear Chat History', on_click=clear_chat_history, use_container_width=True)
+        st.button('Clear Chat/Context History', on_click=clear_chat_history, use_container_width=True)
 
         # Save the chat history
         st.button('Save Chat History', on_click=save_chat_history, use_container_width=True)
