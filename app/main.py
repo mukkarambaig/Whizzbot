@@ -66,7 +66,7 @@ def streamlit_app():
 
     with st.sidebar:
         st.title('💬 Whizzbridge HR Chatbot')
-        st.write("Version 4.0")
+        st.write("Version 5.0")
         
         # Loading chatbot
         if "bot" not in st.session_state.keys():
@@ -93,6 +93,18 @@ def streamlit_app():
 
         if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),), use_container_width=True):
             st.success("Switched to Llama2 70B!", icon="🔥")
+        
+        # FIXME: The following model code is not working
+        if st.button('Use Claude 2', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("CLAUDE2"),), use_container_width=True):
+            st.success("Switched to Claude 2!", icon="🔥")
+        
+        # FIXME: The following model code is not working
+        if st.button('Use Claude 3 Sonnet', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("CLAUDE3"),), use_container_width=True):
+            st.success("Switched to Claude 3 Sonnet", icon="🔥")
+        
+        # FIXME: The following model code is not working
+        if st.button('Use Mixtral 8x7B Instruct', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MISTRAL_AI_INSTRUCT"),), use_container_width=True):
+            st.success("Switched to Mixtral 8x7B Instruct", icon="🔥")
 
         # Clear the chat history
         st.button('Clear Chat/Context History', on_click=clear_chat_history, use_container_width=True)
