@@ -7,20 +7,8 @@ from dotenv import load_dotenv
 import boto3
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.bedrock import Bedrock
+from langchain_community.chat_models import BedrockChat
 from langchain_core.output_parsers import StrOutputParser
-from langchain.chains import LLMChain, ConstitutionalChain
-from langchain.chains.constitutional_ai.models import ConstitutionalPrinciple
-from langchain.memory import ConversationSummaryBufferMemory, ConversationBufferMemory
-from langchain.chains import ConversationChain
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-)
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-
-# Custom modules
-from utils.prompt_generator import prompt_template_generator
 
 class BedrockManager:
     def __init__(self):
@@ -30,8 +18,8 @@ class BedrockManager:
         # Initialize constants from environment variables
         self.service_name = os.getenv("SERVICE_NAME", "bedrock-runtime")
         self.region_name = os.getenv("AWS_REGION", "us-east-1")
-        self.model_id = os.getenv("MODEL_ID", "meta.llama2-13b-chat-v1")
-        self.streaming = os.getenv("STREAMING", "True").lower() == 'true'
+        self.model_id = os.getenv("CLAUDE2", "meta.llama2-13b-chat-v1")
+        self.streaming = True
         self.max_gen_len = int(os.getenv("MAX_GEN_LEN", "512"))
         self.temperature = float(os.getenv("TEMPERATURE", "0.2"))
         self.top_p = float(os.getenv("TOP_P", "0.9"))
@@ -50,38 +38,12 @@ class BedrockManager:
 
     def create_bedrock_instance(self, client):
         """Create and return a Bedrock instance with the specified parameters."""
-        return Bedrock(model_id=self.model_id, client=client, streaming=self.streaming,
+        return BedrockChat(model_id=self.model_id,
+                       streaming=self.streaming,
                        callbacks=[StreamingStdOutCallbackHandler()],
-                       model_kwargs={'max_gen_len': self.max_gen_len, 
-                                     'temperature': self.temperature, 
-                                     'top_p': self.top_p})
+                       model_kwargs={'temperature': self.temperature}
+                       )
 
     def initialize_rag_chain(self):
         """Initialize and return a RAG chain with the specified components."""
         return (self.bedrock_instance | StrOutputParser())
-    
-    # FIXME: require answer formatting!
-    def initialize_conversation_memory_chain(self):
-        """Initialize and return a conversation memory chain with the specified components."""
-        return ConversationChain(
-                                 llm=self.bedrock_instance,
-                                 memory=ConversationSummaryBufferMemory(llm=self.bedrock_instance, max_token_limit=150),
-                                 verbose=True
-                                )
-    
-    # FIXME: require answer formatting! (Works in hand with constitutional chain)
-    def initialize_llm_chain(self):
-        """Initialize and return a LLM chain with the specified components."""
-        return LLMChain(llm=self.bedrock_instance, prompt=prompt_template_generator(), verbose=True)
-    
-    # FIXME: require answer formatting!
-    def constitutional_chain(self):
-        """Return a constitutional chain with the specified components."""
-        principles = ConstitutionalChain.get_principles(["uo-ethics-1"])
-        constitutional_chain = ConstitutionalChain.from_llm(
-            llm = self.bedrock_instance,
-            chain = self.initialize_llm_chain(),
-            constitutional_principles = principles,
-            verbose = True,
-        )
-        return constitutional_chain 

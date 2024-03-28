@@ -1,6 +1,7 @@
 # Build-in modules
 import os
 from typing import List
+import json
 
 # Third-party modules
 from dotenv import load_dotenv
@@ -38,7 +39,7 @@ class bot:
         self.vectorstore_manager: VectorStoreManager = VectorStoreManager(EMBEDDING_MODEL)
         self.database = self.load_db()
         self.model_manager = BedrockManager()
-        self.model_chain = self.model_manager.initialize_rag_chain()
+        # self.model_chain = self.model_manager.initialize_rag_chain()
         self.bot_conversation_memory = []
     
     def split_text(self):
@@ -108,19 +109,38 @@ class bot:
         # Extract context based on the question
         context = self.extract_context(question)
         
-        # Extract conversation history
-        conversation_history = self.extract_conversation_history()
-        
-        # Generate a prompt using the extracted context, the question, and the conversation history
-        prompt = prompt_generator(conversation_history, question, context)
+        # Generate a prompt using the extracted context and the question
+        prompt = prompt_generator(question, context)
         display(prompt)
         
-        # For demonstration purposes, let's assume this is the response generation step
-        response = self.model_chain.invoke(prompt)
-        # response = "Testing response"  # Simulated response for demonstration
+        # Prepare the request body
+        body = json.dumps({
+                        'prompt': prompt,
+                        'max_tokens_to_sample': 4000
+        })
         
-        # Update the conversation memory with the current interaction
-        self.update_conversation_memory(question, response)
+        # Invoke the model
+        response = self.model_manager.client.invoke_model_with_response_stream(
+            modelId='anthropic.claude-v2', 
+            body=body
+        )
+
+        # Initialize an empty string to store the response
+        full_response = ''
+
+        # Iterate through the response stream
+        stream = response.get('body')
+        if stream:
+            for event in stream:
+                chunk = event.get('chunk')
+                if chunk:
+                    # Decode the chunk and extract the 'completion' part of the response
+                    completion = json.loads(chunk.get('bytes').decode())['completion']
+                    # Append the completion part to the full response
+                    full_response += completion
+
+        # Now, full_response contains the entire response text
+        print(full_response)
         
-        # Now the updated conversation memory will be used in the next interaction
-        return response
+        # Return the full response
+        return full_response

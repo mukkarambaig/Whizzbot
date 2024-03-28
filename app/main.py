@@ -74,7 +74,7 @@ def streamlit_app():
             with st.status("Loading the knowledge base and chatbot...", expanded=True) as status:
                 status.success("Knowledge base loaded successfully!", icon="🔥")
                 status.success("Chatbot loaded successfully!", icon="🔥")
-                status.success("Model: Llama2 13B", icon="🔥")
+                status.success("Model: ...", icon="🔥")
         
         # upload documents
         st.header("", divider="blue")
@@ -88,23 +88,23 @@ def streamlit_app():
         st.button("Reload Knowledge Base", on_click=st.session_state['bot'].reload_db, use_container_width=True)
         st.header("", divider="blue")
 
-        if st.button('Use Llama2 13B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_ID"),), use_container_width=True):
-            st.success("Switched to Llama2 13B!", icon="🔥")
+        # if st.button('Use Llama2 13B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_ID"),), use_container_width=True):
+        #     st.success("Switched to Llama2 13B!", icon="🔥")
 
-        if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),), use_container_width=True):
-            st.success("Switched to Llama2 70B!", icon="🔥")
+        # if st.button('Use Llama2 70B', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MODEL_70B_ID"),), use_container_width=True):
+        #     st.success("Switched to Llama2 70B!", icon="🔥")
         
-        # FIXME: The following model code is not working
-        if st.button('Use Claude 2', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("CLAUDE2"),), use_container_width=True):
-            st.success("Switched to Claude 2!", icon="🔥")
+        # # FIXME: The following model code is not working
+        # if st.button('Use Claude 2', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("CLAUDE2"),), use_container_width=True):
+        #     st.success("Switched to Claude 2!", icon="🔥")
         
-        # FIXME: The following model code is not working
-        if st.button('Use Claude 3 Sonnet', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("CLAUDE3"),), use_container_width=True):
-            st.success("Switched to Claude 3 Sonnet", icon="🔥")
+        # # FIXME: The following model code is not working
+        # if st.button('Use Claude 3 Sonnet', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("CLAUDE3"),), use_container_width=True):
+        #     st.success("Switched to Claude 3 Sonnet", icon="🔥")
         
-        # FIXME: The following model code is not working
-        if st.button('Use Mixtral 8x7B Instruct', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MISTRAL_AI_INSTRUCT"),), use_container_width=True):
-            st.success("Switched to Mixtral 8x7B Instruct", icon="🔥")
+        # # FIXME: The following model code is not working
+        # if st.button('Use Mixtral 8x7B Instruct', on_click=st.session_state['bot'].change_model_id, args=(os.getenv("MISTRAL_AI_INSTRUCT"),), use_container_width=True):
+        #     st.success("Switched to Mixtral 8x7B Instruct", icon="🔥")
 
         # Clear the chat history
         st.button('Clear Chat/Context History', on_click=clear_chat_history, use_container_width=True)
